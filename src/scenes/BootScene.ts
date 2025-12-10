@@ -39,9 +39,11 @@ export class BootScene extends Phaser.Scene {
             loadingText.destroy();
         });
 
-        // Load placeholder assets (generated graphics will be created in scenes)
-        // In future, load sprite sheets here:
-        // this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 64, frameHeight: 64 });
+        // Load character sprites
+        this.load.image('player', 'assets/sprites/player.png');
+        this.load.image('goblin', 'assets/sprites/goblin.png');
+        this.load.image('slime', 'assets/sprites/slime.png');
+        this.load.image('dark_knight', 'assets/sprites/dark_knight.png');
     }
 
     create(): void {

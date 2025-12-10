@@ -31,7 +31,11 @@ export class BattleUI {
 
     // Dimensions
     private readonly barWidth = 150;
-    private readonly barHeight = 16;
+    private readonly barHeight = 18;
+
+    // Font styles - VT323 for all text
+    private readonly FONT_PIXEL = '"VT323", monospace';
+    private readonly FONT_READABLE = '"VT323", monospace';
 
     constructor(
         scene: Phaser.Scene,
@@ -76,10 +80,11 @@ export class BattleUI {
         container.add(panel);
 
         // Name
-        const nameText = this.scene.add.text(10, 8, `⚔️ ${this.player.name}`, {
-            fontFamily: 'Arial',
-            fontSize: '14px',
-            color: '#88ccff',
+        const nameText = this.scene.add.text(10, 10, `⚔️ ${this.player.name}`, {
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '20px',
+            color: '#88ddff',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         container.add(nameText);
 
@@ -95,10 +100,11 @@ export class BattleUI {
 
         // Stats text
         this.playerStatsText = this.scene.add.text(165, 30, '', {
-            fontFamily: 'Arial',
-            fontSize: '11px',
+            fontFamily: this.FONT_READABLE,
+            fontSize: '20px',
             color: '#ffffff',
             align: 'right',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         this.playerStatsText.setOrigin(1, 0);
         container.add(this.playerStatsText);
@@ -118,10 +124,11 @@ export class BattleUI {
         container.add(panel);
 
         // Name
-        const nameText = this.scene.add.text(10, 8, `👹 ${this.enemy.name}`, {
-            fontFamily: 'Arial',
-            fontSize: '14px',
-            color: '#ff8888',
+        const nameText = this.scene.add.text(10, 10, `👹 ${this.enemy.name}`, {
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '20px',
+            color: '#ff9999',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         container.add(nameText);
 
@@ -132,10 +139,11 @@ export class BattleUI {
 
         // Stats text
         this.enemyStatsText = this.scene.add.text(165, 45, '', {
-            fontFamily: 'Arial',
-            fontSize: '11px',
+            fontFamily: this.FONT_READABLE,
+            fontSize: '20px',
             color: '#ffffff',
             align: 'right',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         this.enemyStatsText.setOrigin(1, 0);
         container.add(this.enemyStatsText);
@@ -173,9 +181,9 @@ export class BattleUI {
     private createActionMenu(x: number, y: number): void {
         const container = this.scene.add.container(x, y);
         const skills = this.player.skills;
-        const buttonWidth = 120;
-        const buttonHeight = 40;
-        const spacing = 10;
+        const buttonWidth = 110;
+        const buttonHeight = 50;
+        const spacing = 8;
         const totalWidth = skills.length * buttonWidth + (skills.length - 1) * spacing;
         const startX = -totalWidth / 2;
 
@@ -207,29 +215,36 @@ export class BattleUI {
         container.add(bg);
 
         // Icon and name
-        const text = this.scene.add.text(0, -5, `${action.icon}`, {
-            fontFamily: 'Arial',
-            fontSize: '18px',
+        const text = this.scene.add.text(0, -8, `${action.icon}`, {
+            fontFamily: this.FONT_READABLE,
+            fontSize: '24px',
         });
         text.setOrigin(0.5, 0.5);
         container.add(text);
 
-        const nameText = this.scene.add.text(0, 12, action.name, {
-            fontFamily: 'Arial',
-            fontSize: '10px',
-            color: '#cccccc',
+        const nameText = this.scene.add.text(0, 14, action.name, {
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '16px',
+            color: '#dddddd',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         nameText.setOrigin(0.5, 0.5);
         container.add(nameText);
 
         // MP cost indicator
         if (action.mpCost > 0) {
-            const mpText = this.scene.add.text(width / 2 - 8, -height / 2 + 8, `${action.mpCost}`, {
-                fontFamily: 'Arial',
-                fontSize: '9px',
-                color: '#4488ff',
+            const mpBg = this.scene.add.graphics();
+            mpBg.fillStyle(0x2244aa, 0.9);
+            mpBg.fillRoundedRect(width / 2 - 26, -height / 2 + 2, 24, 16, 4);
+            container.add(mpBg);
+
+            const mpText = this.scene.add.text(width / 2 - 14, -height / 2 + 10, `${action.mpCost}`, {
+                fontFamily: this.FONT_READABLE,
+                fontSize: '18px',
+                color: '#88ccff',
+                shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
             });
-            mpText.setOrigin(1, 0);
+            mpText.setOrigin(0.5, 0.5);
             container.add(mpText);
         }
 
@@ -278,11 +293,12 @@ export class BattleUI {
 
         // Message text
         this.messageText = this.scene.add.text(x, y, 'Prepare for battle!', {
-            fontFamily: 'Arial',
-            fontSize: '16px',
+            fontFamily: this.FONT_READABLE,
+            fontSize: '24px',
             color: '#ffffff',
             align: 'center',
             wordWrap: { width: 580 },
+            shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         this.messageText.setOrigin(0.5, 0.5);
         this.uiContainer.add(this.messageText);
@@ -293,9 +309,10 @@ export class BattleUI {
 
         // Title
         const title = this.scene.add.text(0, -20, '⚡ Active Echoes', {
-            fontFamily: 'Arial',
-            fontSize: '12px',
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '18px',
             color: '#aaaaaa',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         title.setOrigin(0.5, 0.5);
         this.echoTimelineContainer.add(title);
@@ -368,9 +385,10 @@ export class BattleUI {
         // Title
         const echoes = this.echoSystem.getAllEchoes();
         const title = this.scene.add.text(0, -20, `⚡ Active Echoes (${echoes.length})`, {
-            fontFamily: 'Arial',
-            fontSize: '12px',
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '18px',
             color: echoes.length > 0 ? '#ffcc44' : '#666666',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         title.setOrigin(0.5, 0.5);
         this.echoTimelineContainer.add(title);
@@ -401,25 +419,28 @@ export class BattleUI {
 
         // Icon
         const icon = this.scene.add.text(-30, 0, echo.icon, {
-            fontSize: '16px',
+            fontFamily: this.FONT_READABLE,
+            fontSize: '20px',
         });
         icon.setOrigin(0.5, 0.5);
         container.add(icon);
 
         // Name
         const name = this.scene.add.text(5, -5, echo.name, {
-            fontFamily: 'Arial',
-            fontSize: '10px',
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '14px',
             color: '#ffffff',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         name.setOrigin(0, 0.5);
         container.add(name);
 
         // Turns remaining
         const turns = this.scene.add.text(5, 8, `${echo.turnsRemaining}T left`, {
-            fontFamily: 'Arial',
-            fontSize: '9px',
+            fontFamily: this.FONT_READABLE,
+            fontSize: '14px',
             color: echo.turnsRemaining <= 1 ? '#ff8844' : '#888888',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         turns.setOrigin(0, 0.5);
         container.add(turns);
@@ -427,7 +448,8 @@ export class BattleUI {
         // Target indicator
         const targetIndicator = echo.targetCharacter.name === this.player.name ? '🔵' : '🔴';
         const targetText = this.scene.add.text(35, 0, targetIndicator, {
-            fontSize: '12px',
+            fontFamily: this.FONT_READABLE,
+            fontSize: '16px',
         });
         targetText.setOrigin(0.5, 0.5);
         container.add(targetText);
@@ -444,11 +466,12 @@ export class BattleUI {
 
         // Flash effect
         const flash = this.scene.add.text(width / 2, height / 2 - 50, `⚡ ${echo.icon} ${echo.name}! ⚡`, {
-            fontFamily: 'Arial',
-            fontSize: '24px',
-            color: '#ffcc00',
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '28px',
+            color: '#ffdd00',
             stroke: '#000000',
-            strokeThickness: 4,
+            strokeThickness: 3,
+            shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         flash.setOrigin(0.5, 0.5);
         flash.setAlpha(0);
@@ -477,20 +500,22 @@ export class BattleUI {
         const { width, height } = this.scene.cameras.main;
 
         const victoryText = this.scene.add.text(width / 2, height / 2, '🎉 VICTORY! 🎉', {
-            fontFamily: 'Arial',
+            fontFamily: this.FONT_PIXEL,
             fontSize: '48px',
-            color: '#44ff44',
+            color: '#44ff88',
             stroke: '#000000',
-            strokeThickness: 6,
+            strokeThickness: 4,
+            shadow: { offsetX: 3, offsetY: 3, color: '#115522', blur: 0, fill: true }
         });
         victoryText.setOrigin(0.5, 0.5);
 
         const expText = this.scene.add.text(width / 2, height / 2 + 50, `+${expReward} EXP`, {
-            fontFamily: 'Arial',
-            fontSize: '24px',
-            color: '#ffcc44',
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '28px',
+            color: '#ffdd44',
             stroke: '#000000',
-            strokeThickness: 3,
+            strokeThickness: 2,
+            shadow: { offsetX: 2, offsetY: 2, color: '#554400', blur: 0, fill: true }
         });
         expText.setOrigin(0.5, 0.5);
 
@@ -506,11 +531,12 @@ export class BattleUI {
         const { width, height } = this.scene.cameras.main;
 
         const defeatText = this.scene.add.text(width / 2, height / 2, '💀 DEFEAT 💀', {
-            fontFamily: 'Arial',
+            fontFamily: this.FONT_PIXEL,
             fontSize: '48px',
-            color: '#ff4444',
+            color: '#ff5555',
             stroke: '#000000',
-            strokeThickness: 6,
+            strokeThickness: 4,
+            shadow: { offsetX: 3, offsetY: 3, color: '#551111', blur: 0, fill: true }
         });
         defeatText.setOrigin(0.5, 0.5);
 
@@ -535,9 +561,10 @@ export class BattleUI {
         this.restartButton.add(bg);
 
         const text = this.scene.add.text(0, 0, '🔄 Battle Again', {
-            fontFamily: 'Arial',
-            fontSize: '18px',
+            fontFamily: this.FONT_PIXEL,
+            fontSize: '22px',
             color: '#ffffff',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         text.setOrigin(0.5, 0.5);
         this.restartButton.add(text);

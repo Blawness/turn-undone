@@ -110,8 +110,7 @@ export class BattleScene extends Phaser.Scene {
             this.player,
             width * 0.25,
             height * 0.55,
-            0x4488ff, // Blue for player
-            '🧙'
+            'player'
         );
 
         // Enemy sprite (right side)
@@ -119,8 +118,7 @@ export class BattleScene extends Phaser.Scene {
             this.enemy,
             width * 0.75,
             height * 0.55,
-            0xff4444, // Red for enemy
-            this.getEnemyEmoji()
+            this.getEnemySpriteKey()
         );
 
         // Store references
@@ -137,37 +135,27 @@ export class BattleScene extends Phaser.Scene {
         character: Character,
         x: number,
         y: number,
-        color: number,
-        emoji: string
+        spriteKey: string
     ): Phaser.GameObjects.Container {
         const container = this.add.container(x, y);
 
         // Shadow
-        const shadow = this.add.ellipse(0, 40, 80, 20, 0x000000, 0.3);
+        const shadow = this.add.ellipse(0, 60, 100, 25, 0x000000, 0.3);
         container.add(shadow);
 
-        // Body (circle for now - can be replaced with sprite)
-        const body = this.add.graphics();
-        body.fillStyle(color, 1);
-        body.fillCircle(0, 0, 40);
-        body.lineStyle(3, 0xffffff, 0.3);
-        body.strokeCircle(0, 0, 40);
-        container.add(body);
-
-        // Character emoji/icon
-        const icon = this.add.text(0, 0, emoji, {
-            fontSize: '40px',
-        });
-        icon.setOrigin(0.5, 0.5);
-        container.add(icon);
+        // Character sprite image
+        const sprite = this.add.image(0, 0, spriteKey);
+        sprite.setScale(0.25); // Scale down from generated size
+        container.add(sprite);
 
         // Name label
-        const nameLabel = this.add.text(0, -60, character.name, {
-            fontFamily: 'Arial',
-            fontSize: '16px',
+        const nameLabel = this.add.text(0, -80, character.name, {
+            fontFamily: '"VT323", monospace',
+            fontSize: '24px',
             color: '#ffffff',
             stroke: '#000000',
             strokeThickness: 3,
+            shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         nameLabel.setOrigin(0.5, 0.5);
         container.add(nameLabel);
@@ -175,14 +163,15 @@ export class BattleScene extends Phaser.Scene {
         return container;
     }
 
-    private getEnemyEmoji(): string {
+    private getEnemySpriteKey(): string {
         switch (this.enemy.name) {
-            case 'Slime': return '🟢';
-            case 'Goblin': return '👺';
-            case 'Dark Knight': return '🗡️';
-            default: return '👾';
+            case 'Slime': return 'slime';
+            case 'Goblin': return 'goblin';
+            case 'Dark Knight': return 'dark_knight';
+            default: return 'goblin';
         }
     }
+
 
     private setupUI(): void {
         this.battleUI = new BattleUI(this, this.player, this.enemy, this.echoSystem);
@@ -328,11 +317,12 @@ export class BattleScene extends Phaser.Scene {
 
     private showDamageNumber(x: number, y: number, damage: number): void {
         const damageText = this.add.text(x, y, `-${damage}`, {
-            fontFamily: 'Arial',
-            fontSize: '28px',
+            fontFamily: '"VT323", monospace',
+            fontSize: '42px',
             color: '#ff4444',
             stroke: '#000000',
             strokeThickness: 4,
+            shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         damageText.setOrigin(0.5, 0.5);
 
