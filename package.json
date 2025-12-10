@@ -1,0 +1,20 @@
+{
+  "name": "turn-undone",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Turn Undone: Echoes of the Last Move - A turn-based RPG with delayed effect mechanics",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "phaser": "^3.80.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^6.0.3"
+  }
+}
