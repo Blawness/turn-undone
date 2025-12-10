@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GameConfig } from './config/GameConfig';
 import { BootScene } from './scenes/BootScene';
 import { BattleScene } from './scenes/BattleScene';
+import { SettingsScene } from './scenes/SettingsScene';
 
 /**
  * Turn Undone: Echoes of the Last Move
@@ -15,11 +16,12 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: 'game-container',
     backgroundColor: GameConfig.backgroundColor,
     pixelArt: true,
+    roundPixels: true,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [BootScene, BattleScene],
+    scene: [BootScene, BattleScene, SettingsScene],
 };
 
 const game = new Phaser.Game(config);

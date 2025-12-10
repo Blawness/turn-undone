@@ -6,6 +6,7 @@ import { EchoSystem, EchoEffect } from '../systems/EchoSystem';
 import { Action } from '../actions/Action';
 import { GameConfig } from '../config/GameConfig';
 import { BattleUI } from '../ui/BattleUI';
+import { SpriteScale, UIFontSizes, scale } from '../utils/UIScale';
 
 /**
  * Battle States
@@ -140,21 +141,22 @@ export class BattleScene extends Phaser.Scene {
         const container = this.add.container(x, y);
 
         // Shadow
-        const shadow = this.add.ellipse(0, 60, 100, 25, 0x000000, 0.3);
+        const shadow = this.add.ellipse(0, scale(60), SpriteScale.shadow, SpriteScale.shadowHeight, 0x000000, 0.3);
         container.add(shadow);
 
         // Character sprite image
         const sprite = this.add.image(0, 0, spriteKey);
-        sprite.setScale(0.25); // Scale down from generated size
+        sprite.setScale(SpriteScale.character);
         container.add(sprite);
 
         // Name label
-        const nameLabel = this.add.text(0, -80, character.name, {
-            fontFamily: '"VT323", monospace',
-            fontSize: '24px',
+        const nameLabel = this.add.text(0, SpriteScale.nameOffset, character.name, {
+            fontFamily: '"Inter", sans-serif',
+            fontSize: UIFontSizes.medium,
+            fontStyle: 'bold',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 3,
+            strokeThickness: scale(3),
             shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         nameLabel.setOrigin(0.5, 0.5);
@@ -317,18 +319,19 @@ export class BattleScene extends Phaser.Scene {
 
     private showDamageNumber(x: number, y: number, damage: number): void {
         const damageText = this.add.text(x, y, `-${damage}`, {
-            fontFamily: '"VT323", monospace',
-            fontSize: '42px',
+            fontFamily: '"Inter", sans-serif',
+            fontSize: UIFontSizes.title,
+            fontStyle: 'bold',
             color: '#ff4444',
             stroke: '#000000',
-            strokeThickness: 4,
+            strokeThickness: scale(4),
             shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         damageText.setOrigin(0.5, 0.5);
 
         this.tweens.add({
             targets: damageText,
-            y: y - 40,
+            y: y - scale(40),
             alpha: 0,
             duration: 800,
             ease: 'Quad.easeOut',

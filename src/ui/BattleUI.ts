@@ -3,6 +3,7 @@ import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { EchoSystem, EchoEffect } from '../systems/EchoSystem';
 import { Action } from '../actions/Action';
+import { UIDimensions, UIFontSizes, scale } from '../utils/UIScale';
 
 /**
  * Battle UI
@@ -29,13 +30,9 @@ export class BattleUI {
     private echoTimelineContainer!: Phaser.GameObjects.Container;
     private restartButton?: Phaser.GameObjects.Container;
 
-    // Dimensions
-    private readonly barWidth = 150;
-    private readonly barHeight = 18;
-
-    // Font styles - VT323 for all text
-    private readonly FONT_PIXEL = '"VT323", monospace';
-    private readonly FONT_READABLE = '"VT323", monospace';
+    // Font styles - Inter for clean HD text
+    private readonly FONT_PIXEL = '"Inter", sans-serif';
+    private readonly FONT_READABLE = '"Inter", sans-serif';
 
     constructor(
         scene: Phaser.Scene,
@@ -55,34 +52,38 @@ export class BattleUI {
         this.uiContainer = this.scene.add.container(0, 0);
 
         // Create stat displays
-        this.createPlayerStats(20, 20);
-        this.createEnemyStats(width - 170, 20);
+        this.createPlayerStats(scale(20), scale(20));
+        this.createEnemyStats(width - UIDimensions.statsPanel.width - scale(20), scale(20));
 
         // Create action menu
-        this.createActionMenu(width / 2, height - 80);
+        this.createActionMenu(width / 2, height - scale(80));
 
         // Create message display
-        this.createMessageDisplay(width / 2, height - 160);
+        this.createMessageDisplay(width / 2, height - scale(160));
 
         // Create echo timeline
-        this.createEchoTimeline(width / 2, 80);
+        this.createEchoTimeline(width / 2, scale(80));
+
+        // Create settings button
+        this.createSettingsButton(width - scale(50), height - scale(50));
     }
 
     private createPlayerStats(x: number, y: number): void {
         const container = this.scene.add.container(x, y);
+        const panel = UIDimensions.statsPanel;
 
         // Background panel
-        const panel = this.scene.add.graphics();
-        panel.fillStyle(0x000000, 0.6);
-        panel.fillRoundedRect(0, 0, 180, 70, 8);
-        panel.lineStyle(2, 0x4488ff, 0.8);
-        panel.strokeRoundedRect(0, 0, 180, 70, 8);
-        container.add(panel);
+        const panelGfx = this.scene.add.graphics();
+        panelGfx.fillStyle(0x000000, 0.6);
+        panelGfx.fillRoundedRect(0, 0, panel.width, panel.height, panel.borderRadius);
+        panelGfx.lineStyle(2, 0x4488ff, 0.8);
+        panelGfx.strokeRoundedRect(0, 0, panel.width, panel.height, panel.borderRadius);
+        container.add(panelGfx);
 
         // Name
-        const nameText = this.scene.add.text(10, 10, `⚔️ ${this.player.name}`, {
+        const nameText = this.scene.add.text(panel.padding, panel.padding, `⚔️ ${this.player.name}`, {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '20px',
+            fontSize: UIFontSizes.large,
             color: '#88ddff',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
@@ -91,17 +92,17 @@ export class BattleUI {
         // HP Bar
         this.playerHPBar = this.scene.add.graphics();
         container.add(this.playerHPBar);
-        this.drawBar(this.playerHPBar, 10, 30, this.player.hp, this.player.stats.maxHP, 0x44ff44, 'HP');
+        this.drawBar(this.playerHPBar, panel.padding, scale(30), this.player.hp, this.player.stats.maxHP, 0x44ff44, 'HP');
 
         // MP Bar
         this.playerMPBar = this.scene.add.graphics();
         container.add(this.playerMPBar);
-        this.drawBar(this.playerMPBar, 10, 50, this.player.mp, this.player.stats.maxMP, 0x4488ff, 'MP');
+        this.drawBar(this.playerMPBar, panel.padding, scale(50), this.player.mp, this.player.stats.maxMP, 0x4488ff, 'MP');
 
         // Stats text
-        this.playerStatsText = this.scene.add.text(165, 30, '', {
+        this.playerStatsText = this.scene.add.text(panel.width - scale(15), scale(30), '', {
             fontFamily: this.FONT_READABLE,
-            fontSize: '20px',
+            fontSize: UIFontSizes.large,
             color: '#ffffff',
             align: 'right',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
@@ -114,19 +115,20 @@ export class BattleUI {
 
     private createEnemyStats(x: number, y: number): void {
         const container = this.scene.add.container(x, y);
+        const panel = UIDimensions.statsPanel;
 
         // Background panel
-        const panel = this.scene.add.graphics();
-        panel.fillStyle(0x000000, 0.6);
-        panel.fillRoundedRect(0, 0, 180, 70, 8);
-        panel.lineStyle(2, 0xff4444, 0.8);
-        panel.strokeRoundedRect(0, 0, 180, 70, 8);
-        container.add(panel);
+        const panelGfx = this.scene.add.graphics();
+        panelGfx.fillStyle(0x000000, 0.6);
+        panelGfx.fillRoundedRect(0, 0, panel.width, panel.height, panel.borderRadius);
+        panelGfx.lineStyle(2, 0xff4444, 0.8);
+        panelGfx.strokeRoundedRect(0, 0, panel.width, panel.height, panel.borderRadius);
+        container.add(panelGfx);
 
         // Name
-        const nameText = this.scene.add.text(10, 10, `👹 ${this.enemy.name}`, {
+        const nameText = this.scene.add.text(panel.padding, panel.padding, `👹 ${this.enemy.name}`, {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '20px',
+            fontSize: UIFontSizes.large,
             color: '#ff9999',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
@@ -135,12 +137,12 @@ export class BattleUI {
         // HP Bar
         this.enemyHPBar = this.scene.add.graphics();
         container.add(this.enemyHPBar);
-        this.drawBar(this.enemyHPBar, 10, 30, this.enemy.hp, this.enemy.stats.maxHP, 0xff4444, 'HP');
+        this.drawBar(this.enemyHPBar, panel.padding, scale(30), this.enemy.hp, this.enemy.stats.maxHP, 0xff4444, 'HP');
 
         // Stats text
-        this.enemyStatsText = this.scene.add.text(165, 45, '', {
+        this.enemyStatsText = this.scene.add.text(panel.width - scale(15), scale(45), '', {
             fontFamily: this.FONT_READABLE,
-            fontSize: '20px',
+            fontSize: UIFontSizes.large,
             color: '#ffffff',
             align: 'right',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
@@ -161,19 +163,22 @@ export class BattleUI {
         _label: string
     ): void {
         graphics.clear();
+        const barWidth = UIDimensions.bars.width;
+        const barHeight = UIDimensions.bars.height;
+        const borderRadius = UIDimensions.bars.borderRadius;
 
         // Background
         graphics.fillStyle(0x333333, 1);
-        graphics.fillRoundedRect(x, y, this.barWidth, this.barHeight, 4);
+        graphics.fillRoundedRect(x, y, barWidth, barHeight, borderRadius);
 
         // Fill
-        const fillWidth = Math.max(0, (current / max) * this.barWidth);
+        const fillWidth = Math.max(0, (current / max) * barWidth);
         graphics.fillStyle(color, 1);
-        graphics.fillRoundedRect(x, y, fillWidth, this.barHeight, 4);
+        graphics.fillRoundedRect(x, y, fillWidth, barHeight, borderRadius);
 
         // Border
         graphics.lineStyle(1, 0xffffff, 0.3);
-        graphics.strokeRoundedRect(x, y, this.barWidth, this.barHeight, 4);
+        graphics.strokeRoundedRect(x, y, barWidth, barHeight, borderRadius);
 
         // Text is added separately (handled by update)
     }
@@ -181,15 +186,13 @@ export class BattleUI {
     private createActionMenu(x: number, y: number): void {
         const container = this.scene.add.container(x, y);
         const skills = this.player.skills;
-        const buttonWidth = 110;
-        const buttonHeight = 50;
-        const spacing = 8;
-        const totalWidth = skills.length * buttonWidth + (skills.length - 1) * spacing;
+        const btn = UIDimensions.actionButton;
+        const totalWidth = skills.length * btn.width + (skills.length - 1) * btn.spacing;
         const startX = -totalWidth / 2;
 
         skills.forEach((skill, index) => {
-            const buttonX = startX + index * (buttonWidth + spacing) + buttonWidth / 2;
-            const button = this.createActionButton(buttonX, 0, buttonWidth, buttonHeight, skill);
+            const buttonX = startX + index * (btn.width + btn.spacing) + btn.width / 2;
+            const button = this.createActionButton(buttonX, 0, btn.width, btn.height, skill);
             container.add(button);
             this.actionButtons.push(button);
         });
@@ -205,26 +208,28 @@ export class BattleUI {
         action: Action
     ): Phaser.GameObjects.Container {
         const container = this.scene.add.container(x, y);
+        const borderRadius = UIDimensions.actionButton.borderRadius;
 
         // Button background
         const bg = this.scene.add.graphics();
         bg.fillStyle(0x2a2a4a, 1);
-        bg.fillRoundedRect(-width / 2, -height / 2, width, height, 6);
+        bg.fillRoundedRect(-width / 2, -height / 2, width, height, borderRadius);
         bg.lineStyle(2, 0x6644aa, 1);
-        bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 6);
+        bg.strokeRoundedRect(-width / 2, -height / 2, width, height, borderRadius);
         container.add(bg);
 
-        // Icon and name
-        const text = this.scene.add.text(0, -8, `${action.icon}`, {
+        // Icon
+        const text = this.scene.add.text(0, scale(-8), `${action.icon}`, {
             fontFamily: this.FONT_READABLE,
-            fontSize: '24px',
+            fontSize: UIFontSizes.xlarge,
         });
         text.setOrigin(0.5, 0.5);
         container.add(text);
 
-        const nameText = this.scene.add.text(0, 14, action.name, {
+        // Name
+        const nameText = this.scene.add.text(0, scale(14), action.name, {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '16px',
+            fontSize: UIFontSizes.normal,
             color: '#dddddd',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
@@ -233,14 +238,16 @@ export class BattleUI {
 
         // MP cost indicator
         if (action.mpCost > 0) {
+            const mpBadgeW = scale(24);
+            const mpBadgeH = scale(16);
             const mpBg = this.scene.add.graphics();
             mpBg.fillStyle(0x2244aa, 0.9);
-            mpBg.fillRoundedRect(width / 2 - 26, -height / 2 + 2, 24, 16, 4);
+            mpBg.fillRoundedRect(width / 2 - mpBadgeW - scale(2), -height / 2 + scale(2), mpBadgeW, mpBadgeH, scale(4));
             container.add(mpBg);
 
-            const mpText = this.scene.add.text(width / 2 - 14, -height / 2 + 10, `${action.mpCost}`, {
+            const mpText = this.scene.add.text(width / 2 - mpBadgeW / 2 - scale(2), -height / 2 + scale(2) + mpBadgeH / 2, `${action.mpCost}`, {
                 fontFamily: this.FONT_READABLE,
-                fontSize: '18px',
+                fontSize: UIFontSizes.medium,
                 color: '#88ccff',
                 shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
             });
@@ -257,17 +264,17 @@ export class BattleUI {
         hitArea.on('pointerover', () => {
             bg.clear();
             bg.fillStyle(0x4a4a7a, 1);
-            bg.fillRoundedRect(-width / 2, -height / 2, width, height, 6);
+            bg.fillRoundedRect(-width / 2, -height / 2, width, height, borderRadius);
             bg.lineStyle(2, 0x8866cc, 1);
-            bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 6);
+            bg.strokeRoundedRect(-width / 2, -height / 2, width, height, borderRadius);
         });
 
         hitArea.on('pointerout', () => {
             bg.clear();
             bg.fillStyle(0x2a2a4a, 1);
-            bg.fillRoundedRect(-width / 2, -height / 2, width, height, 6);
+            bg.fillRoundedRect(-width / 2, -height / 2, width, height, borderRadius);
             bg.lineStyle(2, 0x6644aa, 1);
-            bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 6);
+            bg.strokeRoundedRect(-width / 2, -height / 2, width, height, borderRadius);
         });
 
         hitArea.on('pointerdown', () => {
@@ -285,19 +292,21 @@ export class BattleUI {
     }
 
     private createMessageDisplay(x: number, y: number): void {
+        const msg = UIDimensions.messageBox;
+
         // Background panel
         const panel = this.scene.add.graphics();
         panel.fillStyle(0x000000, 0.7);
-        panel.fillRoundedRect(x - 300, y - 25, 600, 50, 8);
+        panel.fillRoundedRect(x - msg.width / 2, y - msg.height / 2, msg.width, msg.height, msg.borderRadius);
         this.uiContainer.add(panel);
 
         // Message text
         this.messageText = this.scene.add.text(x, y, 'Prepare for battle!', {
             fontFamily: this.FONT_READABLE,
-            fontSize: '24px',
+            fontSize: UIFontSizes.xlarge,
             color: '#ffffff',
             align: 'center',
-            wordWrap: { width: 580 },
+            wordWrap: { width: msg.width - scale(20) },
             shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         this.messageText.setOrigin(0.5, 0.5);
@@ -308,9 +317,9 @@ export class BattleUI {
         this.echoTimelineContainer = this.scene.add.container(x, y);
 
         // Title
-        const title = this.scene.add.text(0, -20, '⚡ Active Echoes', {
+        const title = this.scene.add.text(0, scale(-20), '⚡ Active Echoes', {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '18px',
+            fontSize: UIFontSizes.medium,
             color: '#aaaaaa',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
@@ -318,6 +327,55 @@ export class BattleUI {
         this.echoTimelineContainer.add(title);
 
         this.uiContainer.add(this.echoTimelineContainer);
+    }
+
+    private createSettingsButton(x: number, y: number): void {
+        const btn = UIDimensions.settingsButton;
+        const container = this.scene.add.container(x, y);
+
+        // Button background
+        const bg = this.scene.add.graphics();
+        bg.fillStyle(0x2a2a4a, 0.8);
+        bg.fillRoundedRect(-btn.size / 2, -btn.size / 2, btn.size, btn.size, btn.borderRadius);
+        bg.lineStyle(2, 0x6644aa, 0.8);
+        bg.strokeRoundedRect(-btn.size / 2, -btn.size / 2, btn.size, btn.size, btn.borderRadius);
+        container.add(bg);
+
+        // Settings icon (gear emoji)
+        const icon = this.scene.add.text(0, 0, '⚙️', {
+            fontFamily: this.FONT_READABLE,
+            fontSize: UIFontSizes.xlarge,
+        });
+        icon.setOrigin(0.5, 0.5);
+        container.add(icon);
+
+        // Interactive zone
+        const hitArea = this.scene.add.rectangle(0, 0, btn.size, btn.size, 0x000000, 0);
+        hitArea.setInteractive({ useHandCursor: true });
+        container.add(hitArea);
+
+        // Hover effects
+        hitArea.on('pointerover', () => {
+            bg.clear();
+            bg.fillStyle(0x4a4a7a, 0.9);
+            bg.fillRoundedRect(-btn.size / 2, -btn.size / 2, btn.size, btn.size, btn.borderRadius);
+            bg.lineStyle(2, 0x8866cc, 1);
+            bg.strokeRoundedRect(-btn.size / 2, -btn.size / 2, btn.size, btn.size, btn.borderRadius);
+        });
+
+        hitArea.on('pointerout', () => {
+            bg.clear();
+            bg.fillStyle(0x2a2a4a, 0.8);
+            bg.fillRoundedRect(-btn.size / 2, -btn.size / 2, btn.size, btn.size, btn.borderRadius);
+            bg.lineStyle(2, 0x6644aa, 0.8);
+            bg.strokeRoundedRect(-btn.size / 2, -btn.size / 2, btn.size, btn.size, btn.borderRadius);
+        });
+
+        hitArea.on('pointerdown', () => {
+            this.scene.scene.start('SettingsScene');
+        });
+
+        this.uiContainer.add(container);
     }
 
     onActionSelect(callback: (action: Action) => void): void {
@@ -384,9 +442,9 @@ export class BattleUI {
 
         // Title
         const echoes = this.echoSystem.getAllEchoes();
-        const title = this.scene.add.text(0, -20, `⚡ Active Echoes (${echoes.length})`, {
+        const title = this.scene.add.text(0, scale(-20), `⚡ Active Echoes (${echoes.length})`, {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '18px',
+            fontSize: UIFontSizes.medium,
             color: echoes.length > 0 ? '#ffcc44' : '#666666',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
@@ -396,39 +454,40 @@ export class BattleUI {
         // Display echoes
         const maxDisplay = 5;
         const displayEchoes = echoes.slice(0, maxDisplay);
-        const spacing = 100;
+        const spacing = UIDimensions.echoItem.spacing;
         const startX = -(displayEchoes.length - 1) * spacing / 2;
 
         displayEchoes.forEach((echo, index) => {
             const echoX = startX + index * spacing;
-            const echoDisplay = this.createEchoDisplay(echo, echoX, 10);
+            const echoDisplay = this.createEchoDisplay(echo, echoX, scale(10));
             this.echoTimelineContainer.add(echoDisplay);
         });
     }
 
     private createEchoDisplay(echo: EchoEffect, x: number, y: number): Phaser.GameObjects.Container {
         const container = this.scene.add.container(x, y);
+        const echoItem = UIDimensions.echoItem;
 
         // Background
         const bg = this.scene.add.graphics();
         bg.fillStyle(0x332244, 0.8);
-        bg.fillRoundedRect(-40, -15, 80, 40, 6);
+        bg.fillRoundedRect(-echoItem.width / 2, -echoItem.height / 2 + scale(5), echoItem.width, echoItem.height, echoItem.borderRadius);
         bg.lineStyle(1, 0x6644aa, 0.8);
-        bg.strokeRoundedRect(-40, -15, 80, 40, 6);
+        bg.strokeRoundedRect(-echoItem.width / 2, -echoItem.height / 2 + scale(5), echoItem.width, echoItem.height, echoItem.borderRadius);
         container.add(bg);
 
         // Icon
-        const icon = this.scene.add.text(-30, 0, echo.icon, {
+        const icon = this.scene.add.text(scale(-30), 0, echo.icon, {
             fontFamily: this.FONT_READABLE,
-            fontSize: '20px',
+            fontSize: UIFontSizes.large,
         });
         icon.setOrigin(0.5, 0.5);
         container.add(icon);
 
         // Name
-        const name = this.scene.add.text(5, -5, echo.name, {
+        const name = this.scene.add.text(scale(5), scale(-5), echo.name, {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '14px',
+            fontSize: UIFontSizes.small,
             color: '#ffffff',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
@@ -436,9 +495,9 @@ export class BattleUI {
         container.add(name);
 
         // Turns remaining
-        const turns = this.scene.add.text(5, 8, `${echo.turnsRemaining}T left`, {
+        const turns = this.scene.add.text(scale(5), scale(8), `${echo.turnsRemaining}T left`, {
             fontFamily: this.FONT_READABLE,
-            fontSize: '14px',
+            fontSize: UIFontSizes.small,
             color: echo.turnsRemaining <= 1 ? '#ff8844' : '#888888',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
@@ -447,9 +506,9 @@ export class BattleUI {
 
         // Target indicator
         const targetIndicator = echo.targetCharacter.name === this.player.name ? '🔵' : '🔴';
-        const targetText = this.scene.add.text(35, 0, targetIndicator, {
+        const targetText = this.scene.add.text(scale(35), 0, targetIndicator, {
             fontFamily: this.FONT_READABLE,
-            fontSize: '16px',
+            fontSize: UIFontSizes.normal,
         });
         targetText.setOrigin(0.5, 0.5);
         container.add(targetText);
@@ -465,12 +524,12 @@ export class BattleUI {
         const { width, height } = this.scene.cameras.main;
 
         // Flash effect
-        const flash = this.scene.add.text(width / 2, height / 2 - 50, `⚡ ${echo.icon} ${echo.name}! ⚡`, {
+        const flash = this.scene.add.text(width / 2, height / 2 - scale(50), `⚡ ${echo.icon} ${echo.name}! ⚡`, {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '28px',
+            fontSize: UIFontSizes.xxlarge,
             color: '#ffdd00',
             stroke: '#000000',
-            strokeThickness: 3,
+            strokeThickness: scale(3),
             shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, fill: true }
         });
         flash.setOrigin(0.5, 0.5);
@@ -479,7 +538,7 @@ export class BattleUI {
         this.scene.tweens.add({
             targets: flash,
             alpha: 1,
-            y: height / 2 - 70,
+            y: height / 2 - scale(70),
             duration: 300,
             yoyo: true,
             hold: 500,
@@ -501,20 +560,20 @@ export class BattleUI {
 
         const victoryText = this.scene.add.text(width / 2, height / 2, '🎉 VICTORY! 🎉', {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '48px',
+            fontSize: UIFontSizes.victory,
             color: '#44ff88',
             stroke: '#000000',
-            strokeThickness: 4,
+            strokeThickness: scale(4),
             shadow: { offsetX: 3, offsetY: 3, color: '#115522', blur: 0, fill: true }
         });
         victoryText.setOrigin(0.5, 0.5);
 
-        const expText = this.scene.add.text(width / 2, height / 2 + 50, `+${expReward} EXP`, {
+        const expText = this.scene.add.text(width / 2, height / 2 + scale(50), `+${expReward} EXP`, {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '28px',
+            fontSize: UIFontSizes.xxlarge,
             color: '#ffdd44',
             stroke: '#000000',
-            strokeThickness: 2,
+            strokeThickness: scale(2),
             shadow: { offsetX: 2, offsetY: 2, color: '#554400', blur: 0, fill: true }
         });
         expText.setOrigin(0.5, 0.5);
@@ -532,10 +591,10 @@ export class BattleUI {
 
         const defeatText = this.scene.add.text(width / 2, height / 2, '💀 DEFEAT 💀', {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '48px',
+            fontSize: UIFontSizes.victory,
             color: '#ff5555',
             stroke: '#000000',
-            strokeThickness: 4,
+            strokeThickness: scale(4),
             shadow: { offsetX: 3, offsetY: 3, color: '#551111', blur: 0, fill: true }
         });
         defeatText.setOrigin(0.5, 0.5);
@@ -550,43 +609,44 @@ export class BattleUI {
 
     showRestartButton(callback: () => void): void {
         const { width, height } = this.scene.cameras.main;
+        const btn = UIDimensions.restartButton;
 
-        this.restartButton = this.scene.add.container(width / 2, height / 2 + 100);
+        this.restartButton = this.scene.add.container(width / 2, height / 2 + scale(100));
 
         const bg = this.scene.add.graphics();
         bg.fillStyle(0x4444aa, 1);
-        bg.fillRoundedRect(-80, -25, 160, 50, 8);
+        bg.fillRoundedRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height, btn.borderRadius);
         bg.lineStyle(2, 0x6666cc, 1);
-        bg.strokeRoundedRect(-80, -25, 160, 50, 8);
+        bg.strokeRoundedRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height, btn.borderRadius);
         this.restartButton.add(bg);
 
         const text = this.scene.add.text(0, 0, '🔄 Battle Again', {
             fontFamily: this.FONT_PIXEL,
-            fontSize: '22px',
+            fontSize: UIFontSizes.large,
             color: '#ffffff',
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
         });
         text.setOrigin(0.5, 0.5);
         this.restartButton.add(text);
 
-        const hitArea = this.scene.add.rectangle(0, 0, 160, 50, 0x000000, 0);
+        const hitArea = this.scene.add.rectangle(0, 0, btn.width, btn.height, 0x000000, 0);
         hitArea.setInteractive({ useHandCursor: true });
         this.restartButton.add(hitArea);
 
         hitArea.on('pointerover', () => {
             bg.clear();
             bg.fillStyle(0x5555cc, 1);
-            bg.fillRoundedRect(-80, -25, 160, 50, 8);
+            bg.fillRoundedRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height, btn.borderRadius);
             bg.lineStyle(2, 0x8888ff, 1);
-            bg.strokeRoundedRect(-80, -25, 160, 50, 8);
+            bg.strokeRoundedRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height, btn.borderRadius);
         });
 
         hitArea.on('pointerout', () => {
             bg.clear();
             bg.fillStyle(0x4444aa, 1);
-            bg.fillRoundedRect(-80, -25, 160, 50, 8);
+            bg.fillRoundedRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height, btn.borderRadius);
             bg.lineStyle(2, 0x6666cc, 1);
-            bg.strokeRoundedRect(-80, -25, 160, 50, 8);
+            bg.strokeRoundedRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height, btn.borderRadius);
         });
 
         hitArea.on('pointerdown', callback);
@@ -599,3 +659,4 @@ export class BattleUI {
         });
     }
 }
+
